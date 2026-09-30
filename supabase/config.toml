@@ -1,0 +1,4 @@
+project_id = "sp-affiliate"
+[functions.sp-affiliate-api]
+verify_jwt = true
+entrypoint = "./functions/sp-affiliate-api/index.ts"

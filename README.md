@@ -1,4 +1,4 @@
-# Affiliate Intelligence Studio 2.1
+# Affiliate Intelligence Studio 2.2
 
 เว็บ HTML สำหรับจัดการงาน Shopee Affiliate ตั้งแต่รวบรวมหลักฐานสินค้า สร้างโครงบท วางแผนผลิตเนื้อหา ไปจนถึงติดตามผล TikTok / Facebook
 
@@ -27,18 +27,27 @@
 - เปรียบเทียบการทดลองเชิงสังเกต และคำนวณสถานการณ์สมมติจากค่าที่กรอก
 - สำรอง/นำเข้า JSON พร้อมตรวจข้อมูล และส่งออกผล CSV
 
-## ข้อจำกัดของ HTML edition
+## บัญชี คลาวด์ และบริการออนไลน์
 
-- **ยังไม่ได้เชื่อม Shopee resolver, AI หรือการค้นออนไลน์**
+- สมัคร/เข้าสู่ระบบ ยืนยันอีเมล และกู้รหัสผ่านผ่าน Supabase Auth
+- บัญชีแต่ละคนมีพื้นที่ในเครื่องแยกจากข้อมูลเดิม สามารถคัดลอกข้อมูลเดิมเข้าบัญชีได้
+- ส่ง/รับข้อมูลคลาวด์แบบเลือกเอง เปิด autosync ได้หลังซิงก์ครั้งแรก และหยุดให้ตรวจเมื่อเวอร์ชันขัดกัน
+- รับข้อมูลคลาวด์แล้วเก็บสำเนาก่อนซิงก์ให้ส่งออก JSON กู้คืนได้
+- Backend และตารางสิทธิ์เจ้าของข้อมูลเผยแพร่แล้ว ดู [คู่มือติดตั้งและสถานะ](docs/cloud-setup.md)
+- Shopee/AI มี adapter และหน้าตรวจข้อมูลก่อนใช้ แต่ **ยังไม่มีคีย์และยังไม่ผ่านการเรียกบริการจริง**
+
+## ข้อจำกัด
+
+- **Shopee/AI ยังไม่เชื่อมต่อจนกว่าจะตั้งค่าคีย์และทดสอบจริงสำเร็จ**; ไม่มีการค้นเว็บทั่วไป
 - การวิเคราะห์ใช้คะแนนและหลักฐานที่ผู้ใช้กรอก การสร้างบทใช้แม่แบบในเครื่อง
-- ไม่ดึงชื่อ ราคา รูป หรือคอมมิชชันจากลิงก์ให้อัตโนมัติ
+- การดึงชื่อ ราคา รูป และคอมมิชชันต้องใช้บัญชีและสิทธิ์ Shopee Affiliate Open API; ระบบให้ตรวจผลก่อนเติมช่องว่าง
 - ต้องตรวจข้ออ้าง แหล่งข้อมูล รุ่น ราคา และเงื่อนไขก่อนใช้บทจริง
 - ไม่โพสต์ไป TikTok/Facebook อัตโนมัติ และไม่รับประกันยอดขายหรือความแม่นยำเชิงพยากรณ์
-- การเชื่อมออนไลน์ในอนาคตต้องมี backend สำหรับตรวจ URL และเก็บ API key; ห้ามฝัง secret ใน HTML
+- เก็บ API key บน Supabase Edge Function เท่านั้น ห้ามฝัง secret ใน HTML
 
 ## ข้อมูลและการสำรอง
 
-ข้อมูลที่บันทึกอยู่ใน IndexedDB ของเบราว์เซอร์ ไม่ถูกอัปโหลดเข้า repository นี้หรือซิงก์ข้ามเครื่องโดยแอป
+ข้อมูลบันทึกใน IndexedDB ของเบราว์เซอร์เสมอ ไม่ถูกอัปโหลดเข้า repository ข้อมูลบัญชีจะซิงก์เมื่อคุณเลือกส่งขึ้นคลาวด์หรือเปิด autosync; ข้อมูลผู้ใช้ทั่วไปและโหมดตัวอย่างไม่ถูกส่งโดยอัตโนมัติ
 ควรส่งออก JSON เป็นระยะ โดยเฉพาะก่อนล้างข้อมูลเบราว์เซอร์ ย้ายไฟล์ หรือย้ายเครื่อง
 ร่างและขั้นตอนที่เปิดอยู่ถูกเก็บแยกจากข้อมูลที่ยืนยันแล้ว การบันทึกร่างไม่เปลี่ยนบทเป็น Ready
 ไฟล์ JSON รุ่นใหม่รวมร่างที่กู้คืนได้ แต่ไม่รวมประวัติ Undo/Redo; ประวัติ Undo/Redo เก็บในเบราว์เซอร์สูงสุด 60 จุดต่อบท
@@ -56,6 +65,7 @@
 ใช้ Node.js 22 ขึ้นไป แก้ไฟล์ใน `src/` แล้วรัน:
 
 ```sh
+npm ci
 npm run build
 ```
 
@@ -67,6 +77,8 @@ npm run build
 npm ci
 npx playwright install chromium
 npm test
+npm run test:cloud
+npm run test:server
 ```
 
 หากมี Chromium อยู่แล้ว ใช้ `CHROMIUM_EXECUTABLE=/path/to/chromium npm test` ได้
@@ -89,5 +101,4 @@ Undo/Redo, คืนเวอร์ชันเก่า/ใหม่, นำเ
 
 A self-contained, bilingual local workspace for evidence-based affiliate planning and tracking.
 Download and open `index.html` in Chrome or Edge. No build step is required.
-The app uses manual evidence and local story templates; Shopee retrieval, online AI, and online research are **not connected**.
-Records stay in your browser. Export JSON backups regularly.
+Local evidence and story templates work offline. Optional accounts and revision-aware cloud backup are implemented. Shopee/AI adapters require server credentials and live verification; they remain **not connected**. General web research is not implemented. Export JSON backups regularly. See [cloud setup](docs/cloud-setup.md) for deployment and verification limits.

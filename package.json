@@ -1,1 +1,21 @@
-{"name":"sp-affiliate","version":"2.1.0","private":true,"scripts":{"build":"node scripts/build.mjs","test":"node tests/upgrade.cjs"},"devDependencies":{"playwright":"1.62.1"}}
+{
+  "name": "sp-affiliate",
+  "version": "2.2.0",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node tests/upgrade.cjs",
+    "test:server": "node --test tests/providers.test.mjs tests/database.test.mjs",
+    "build:site": "node scripts/package-site.mjs",
+    "test:cloud": "node tests/cloud.cjs",
+    "test:webkit": "BROWSER=webkit node tests/upgrade.cjs && BROWSER=webkit node tests/cloud.cjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
+    "esbuild": "0.28.2",
+    "playwright": "1.62.1"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.117.2"
+  }
+}
