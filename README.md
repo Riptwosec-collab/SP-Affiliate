@@ -1,4 +1,4 @@
-# Affiliate Intelligence Studio 2.2
+# SP-Affiliate 2.3
 
 เว็บ HTML สำหรับจัดการงาน Shopee Affiliate ตั้งแต่รวบรวมหลักฐานสินค้า สร้างโครงบท วางแผนผลิตเนื้อหา ไปจนถึงติดตามผล TikTok / Facebook
 
@@ -13,7 +13,10 @@
 
 ## ความสามารถ
 
-- UI ไทย–อังกฤษ ธีม Graphite/Cyan/Violet รองรับคอมและมือถือ
+- หน้าร้านโทน Graphite/Midnight Blue พร้อม Cyan/Violet accent รองรับคอมและมือถือ
+- Hero และหมวดสินค้าแบบเลื่อนแนวนอน การ์ดจากสินค้าที่บันทึกจริง และเมนูพื้นที่ทำงานบนมือถือ
+- ปุ่ม TH/EN แบบ segmented บันทึกภาษาที่เลือก และคำแปล UI รวมใน src/translations.js
+- ปุ่มกระเป๋าเปิดคลังสินค้าที่บันทึกไว้ ไม่มีระบบตะกร้าชำระเงินหรือสินค้าขายสมมติ
 - ฟอร์มสินค้า 4 ขั้น พร้อมค้นหา/กรอง และมุมมองการ์ดหรือตาราง
 - Autosave ร่างสินค้า/บท แยกตามรายการและแยกโหมดจริง–ตัวอย่าง พร้อมกู้หลังรีเฟรช
 - Story Studio แบบแท็บและการ์ดฉาก, Undo/Redo, คืนเวอร์ชันเป็นร่าง, คลัง Hook และโหมดซ้อมอ่านบท
@@ -78,6 +81,7 @@ npm ci
 npx playwright install chromium
 npm test
 npm run test:cloud
+npm run test:storefront
 npm run test:server
 ```
 
@@ -102,3 +106,13 @@ Undo/Redo, คืนเวอร์ชันเก่า/ใหม่, นำเ
 A self-contained, bilingual local workspace for evidence-based affiliate planning and tracking.
 Download and open `index.html` in Chrome or Edge. No build step is required.
 Local evidence and story templates work offline. Optional accounts and revision-aware cloud backup are implemented. Shopee/AI adapters require server credentials and live verification; they remain **not connected**. General web research is not implemented. Export JSON backups regularly. See [cloud setup](docs/cloud-setup.md) for deployment and verification limits.
+
+## หน้าร้านรุ่น 2.3
+
+- src/storefront.js: หน้าร้านจากข้อมูลเดิมและ SVG ตกแต่งในตัว ไม่มีการเติมสินค้าหรือราคาอัตโนมัติ
+- src/premium.css: ธีมร่วมทั้งเว็บ header, cards, ฟอร์ม, Story Studio และหน้าจอมือถือ
+- src/translations.js: คำแปล UI ไทย/อังกฤษ ส่วนข้อความสินค้าและบทที่ผู้ใช้สร้างคงภาษาเดิม
+- หมวดกรองจากชื่อ รุ่น และการใช้งานที่บันทึกไว้ ไม่เปลี่ยน schema หรือข้อมูลเดิม
+- สถานะทดสอบ: 15 workflow + 7 cloud (mock service) + 6 storefront + 11 backend = 39 กรณีผ่าน
+- Responsive ทดสอบ Chromium ที่ 320, 390, 768, 1024 และ 1440 px ทั้งสองภาษา; ยังไม่ใช่การรับรองบนอุปกรณ์ iOS จริง
+- ดูรายละเอียดการออกแบบใน [implementation brief](docs/designs/premium-storefront.md)

@@ -1,6 +1,6 @@
 {
   "name": "sp-affiliate",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "private": true,
   "scripts": {
     "build": "node scripts/build.mjs",
@@ -8,7 +8,8 @@
     "test:server": "node --test tests/providers.test.mjs tests/database.test.mjs",
     "build:site": "node scripts/package-site.mjs",
     "test:cloud": "node tests/cloud.cjs",
-    "test:webkit": "BROWSER=webkit node tests/upgrade.cjs && BROWSER=webkit node tests/cloud.cjs"
+    "test:webkit": "BROWSER=webkit node tests/upgrade.cjs && BROWSER=webkit node tests/cloud.cjs",
+    "test:storefront": "node tests/storefront.cjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.8",
