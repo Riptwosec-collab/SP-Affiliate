@@ -14,22 +14,65 @@ const fs=require('node:fs'),http=require('node:http'),path=require('node:path');
   await p.screenshot({path:path.join(__dirname,'../test-results/storefront-desktop.png'),fullPage:true});
  });
  await test('real saved products filter without changing records or inventing prices',async p=>{
-  const before=await p.evaluate(async()=>{state=demoData();state.products[0].title='MacBook creator test';state.products[1].title='iPhone camera test';state.products[2].title='AirPods audio test';state.products.forEach(x=>{x.variant='TEST';x.usecase='User authored content'});state.products[1].price=null;await persist();render();return JSON.stringify(state)});
+  const before=await p.evaluate(async()=>{state=demoData();state.products[0].title='Home creator test';state.products[0].category='Home';state.products[1].title='Beauty creator test';state.products[1].category='Beauty';state.products[2].title='Pet creator test';state.products[2].category='Pets';state.products.forEach(x=>{x.variant='TEST';x.usecase='User authored content'});state.products[1].price=null;await persist();render();return JSON.stringify(state)});
   assert.equal(await p.locator('.showcase-card').count(),3);
-  await p.locator('.category-tile[data-category=iphone]').click();assert.equal(await p.locator('.showcase-card').count(),1);
-  assert.ok((await p.locator('.showcase-card').innerText()).includes('iPhone camera test'));
+  await p.locator('.filter-chips [data-category="custom:Beauty"]').click();assert.equal(await p.locator('.showcase-card').count(),1);
+  assert.ok((await p.locator('.showcase-card').innerText()).includes('Beauty creator test'));
   assert.ok((await p.locator('.showcase-price').innerText()).includes('ยังไม่ระบุราคา'));
   await p.locator('[data-action=lang][data-lang=en]').click();assert.ok((await p.locator('.showcase-price').innerText()).includes('Price not recorded'));
   assert.equal(await p.evaluate(()=>JSON.stringify(state)),before);
   await p.locator('.filter-chips [data-category=all]').focus();await p.keyboard.press('Enter');assert.equal(await p.evaluate(()=>document.activeElement.dataset.category),'all');assert.equal(await p.evaluate(()=>document.activeElement.parentElement.className),'filter-chips');assert.equal(await p.locator('.showcase-card').count(),3);
   await p.locator('#store-search').click();assert.equal(await p.evaluate(()=>document.activeElement.id),'productSearch');
-  await p.locator('#productSearch').fill('iPhone');assert.equal(await p.locator('.product-title').count(),1);
+  await p.locator('#productSearch').fill('Beauty');assert.equal(await p.locator('.product-title').count(),1);
+ });
+ await test('link entry and product metadata survive reload, language, save and backup',async p=>{
+  await p.locator('#creator-link').fill('https://s.shopee.co.th/studio-test');
+  await p.locator('[data-action=start-product-link]').click();
+  assert.equal(await p.locator('#affiliate').inputValue(),'https://s.shopee.co.th/studio-test');
+  await p.locator('#title').fill('Ceramic bowl');await p.locator('#variant').fill('White');
+  await p.locator('#category').fill('Home & kitchen');await p.locator('#brand').fill('Mek Studio');await p.locator('#tags').fill('ceramic, tableware');
+  await p.waitForFunction(()=>document.querySelector('#save-status').dataset.state==='saved');
+  await p.reload();await p.waitForSelector('#category');assert.equal(await p.locator('#category').inputValue(),'Home & kitchen');
+  await p.locator('[data-lang=en]').click();assert.equal(await p.locator('#brand').inputValue(),'Mek Studio');
+  await p.locator('[data-action=product-step][data-step="1"]').click();
+  await p.locator('#usecase').fill('Serve breakfast');
+  await p.locator('[data-action=product-step][data-step="3"]').click();await p.locator('#product-submit').click();
+  await p.waitForSelector('#productSearch');
+  const record=await p.evaluate(()=>state.products[0]);assert.equal(record.category,'Home & kitchen');assert.equal(record.tags,'ceramic, tableware');
+  const imported=await p.evaluate(()=>validateImport(backupPayload()).products[0]);assert.equal(imported.brand,'Mek Studio');
+  await p.locator('#productSearch').fill('tableware');assert.equal(await p.locator('.product-title').count(),1);
+  await p.locator('#productSearch').fill('');await p.locator('#productCategory').selectOption('custom:Home & kitchen');assert.equal(await p.locator('.product-title').count(),1);
+  await p.reload();await p.waitForSelector('#productCategory');assert.equal(await p.locator('#productCategory').inputValue(),'custom:Home & kitchen');
+ });
+ await test('legacy categories stay optional and custom category markup is escaped',async p=>{
+  const original=await p.evaluate(async()=>{state=demoData();await persist();render();return JSON.stringify(state)});
+  assert.ok((await p.locator('.filter-chips').innerText()).includes('ยังไม่จัดหมวด'));
+  assert.equal(await p.evaluate(()=>JSON.stringify(state)),original);
+  await p.evaluate(()=>{state.products[0].category='<img src=x onerror=alert(1)>';state.products[0].brand='Custom';render()});
+  assert.equal(await p.locator('.filter-chips img').count(),0);
+  await p.locator('.filter-chips button').filter({hasText:'<img src=x onerror=alert(1)>'}).click();assert.equal(await p.locator('.showcase-card').count(),1);
+  assert.equal(await p.evaluate(()=>document.activeElement.dataset.category),'custom:<img src=x onerror=alert(1)>');
+  assert.equal(await p.evaluate(()=>validateImport(backupPayload()).products[0].category),'<img src=x onerror=alert(1)>');
+  assert.ok(await p.evaluate(()=>{state.products[0].category={invalid:true};try{validateImport(backupPayload());return false}catch{return true}}));
+ });
+ await test('quick-entry Enter preserves an existing unfinished product',async p=>{
+  await p.locator('#creator-link').fill('https://s.shopee.co.th/first-product');await p.locator('#creator-link').press('Enter');
+  await p.locator('#title').fill('Keep this unfinished product');
+  await p.locator('#brand-home').click();await p.locator('#creator-link').fill('https://s.shopee.co.th/second-product');await p.locator('#creator-link').press('Enter');
+  assert.equal(await p.locator('#affiliate').inputValue(),'https://s.shopee.co.th/first-product');
+  assert.equal(await p.locator('#title').inputValue(),'Keep this unfinished product');
+  assert.ok((await p.locator('#toast').innerText()).includes('ร่างสินค้าที่ค้างไว้'));
+ });
+ await test('invalid quick link stays on home with an accessible error',async p=>{
+  await p.locator('#creator-link').fill('javascript:alert(1)');await p.locator('[data-action=start-product-link]').click();
+  assert.equal(await p.locator('#creator-link').getAttribute('aria-invalid'),'true');assert.ok(await p.locator('#creator-link-error').isVisible());
+  assert.equal(await p.evaluate(()=>state.products.length),0);
  });
  await test('UI dictionary covers both languages and preference persists',async p=>{
   assert.deepEqual(await p.evaluate(()=>Object.keys(TRANSLATIONS.th).sort()),await p.evaluate(()=>Object.keys(TRANSLATIONS.en).sort()));
   await p.locator('[data-lang=en]').click();assert.equal(await p.locator('html').getAttribute('lang'),'en');
   assert.equal(await p.locator('[data-lang=en]').getAttribute('aria-pressed'),'true');
-  assert.ok((await p.locator('h1').innerText()).includes('Your Store.'));
+  assert.ok((await p.locator('h1').innerText()).includes('Every product.'));
   await p.reload();await p.waitForSelector('.store-hero');assert.equal(await p.locator('html').getAttribute('lang'),'en');
   for(const route of ['today','analyze','products','studio','planner','results','lab','settings']){
    await p.evaluate(r=>navigateTo(r),route);
