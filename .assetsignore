@@ -1,0 +1,5 @@
+# index.html is the committed single-file build output.
+# Deny everything else, including dependencies, source, tests and credentials.
+*
+!index.html
+!_headers
