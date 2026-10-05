@@ -22,7 +22,7 @@ const fs=require('node:fs'),http=require('node:http'),path=require('node:path');
   await p.locator('[data-action=lang][data-lang=en]').click();assert.ok((await p.locator('.showcase-price').innerText()).includes('Price not recorded'));
   assert.equal(await p.evaluate(()=>JSON.stringify(state)),before);
   await p.locator('.filter-chips [data-category=all]').focus();await p.keyboard.press('Enter');assert.equal(await p.evaluate(()=>document.activeElement.dataset.category),'all');assert.equal(await p.evaluate(()=>document.activeElement.parentElement.className),'filter-chips');assert.equal(await p.locator('.showcase-card').count(),3);
-  await p.locator('#store-search').click();assert.equal(await p.evaluate(()=>document.activeElement.id),'productSearch');
+  await p.locator('#global-search-button').click();assert.equal(await p.evaluate(()=>document.activeElement.id),'productSearch');
   await p.locator('#productSearch').fill('Beauty');assert.equal(await p.locator('.product-title').count(),1);
  });
  await test('link entry and product metadata survive reload, language, save and backup',async p=>{
@@ -72,13 +72,47 @@ const fs=require('node:fs'),http=require('node:http'),path=require('node:path');
   assert.deepEqual(await p.evaluate(()=>Object.keys(TRANSLATIONS.th).sort()),await p.evaluate(()=>Object.keys(TRANSLATIONS.en).sort()));
   await p.locator('[data-lang=en]').click();assert.equal(await p.locator('html').getAttribute('lang'),'en');
   assert.equal(await p.locator('[data-lang=en]').getAttribute('aria-pressed'),'true');
-  assert.ok((await p.locator('h1').innerText()).includes('Every product.'));
+  assert.ok((await p.locator('h1').innerText()).includes('Paste a product link.'));
   await p.reload();await p.waitForSelector('.store-hero');assert.equal(await p.locator('html').getAttribute('lang'),'en');
   for(const route of ['today','analyze','products','studio','planner','results','lab','settings']){
    await p.evaluate(r=>navigateTo(r),route);
    const thai=await p.locator('#main').innerText();assert.ok(!/[\u0e00-\u0e7f]/.test(thai),'Unexpected Thai UI on '+route);
   }
   await p.locator('[data-lang=th]').click();assert.equal(await p.locator('html').getAttribute('lang'),'th');
+ });
+ await test('global search clears stale filters and supports links without losing drafts',async p=>{
+  await p.evaluate(async()=>{state=demoData();await persist();render()});
+  await p.locator('#global-query').fill('สายชาร์จ');await p.locator('#global-query').press('Enter');
+  assert.equal(await p.locator('.product-title').count(),1);
+  await p.locator('#productStatus').selectOption('archived');
+  assert.equal(await p.locator('.product-title').count(),0);
+  await p.locator('#global-query').fill('สายชาร์จ');await p.locator('#global-query').press('Enter');
+  assert.equal(await p.locator('.product-title').count(),1);
+  assert.equal(await p.locator('#productStatus').inputValue(),'all');
+  await p.reload();await p.waitForSelector('#productSearch');assert.equal(await p.locator('#productSearch').inputValue(),'สายชาร์จ');
+  await p.locator('#global-query').fill('https://example.com/unsupported');await p.locator('#global-query').press('Enter');
+  assert.equal(await p.locator('#global-query').getAttribute('aria-invalid'),'true');
+  await p.locator('#global-query').fill('https://s.shopee.co.th/global');await p.locator('#global-query').press('Enter');
+  assert.equal(await p.locator('#affiliate').inputValue(),'https://s.shopee.co.th/global');
+  await p.locator('#title').fill('Keep global draft');
+  await p.locator('#global-query').fill('https://s.shopee.co.th/another');await p.locator('#global-query').press('Enter');
+  assert.equal(await p.locator('#title').inputValue(),'Keep global draft');
+  assert.equal(await p.locator('#affiliate').inputValue(),'https://s.shopee.co.th/global');
+  await p.evaluate(()=>navigateTo('studio',state.stories[0].id));
+  await p.locator('#storyHookA').fill('Keep story when pasting a new link');
+  await p.locator('#global-query').fill('https://s.shopee.co.th/from-story');await p.locator('#global-query').press('Enter');
+  await p.evaluate(()=>navigateTo('studio',state.stories[0].id));
+  assert.equal(await p.locator('#storyHookA').inputValue(),'Keep story when pasting a new link');
+ });
+ await test('sorting puts unknown values last and background preference survives refresh',async p=>{
+  const before=await p.evaluate(async()=>{state=demoData();state.products[0].price=null;state.products[1].price=200;state.products[2].price=100;await persist();render();return JSON.stringify(state)});
+  await p.locator('#store-sort').selectOption('price');
+  assert.equal(await p.locator('.showcase-card').first().locator('h3').innerText(),'กระเป๋าจัดระเบียบสายชาร์จ');
+  assert.ok((await p.locator('.showcase-card').last().innerText()).includes('ยังไม่ระบุราคา'));
+  await p.locator('[data-lang=en]').click();assert.equal(await p.locator('#store-sort').inputValue(),'price');
+  await p.locator('#appearance-toggle').click();assert.equal(await p.locator('#appearance-toggle').getAttribute('aria-pressed'),'true');
+  await p.reload();await p.waitForSelector('.store-hero');assert.equal(await p.locator('#appearance-toggle').getAttribute('aria-pressed'),'true');
+  assert.equal(await p.evaluate(()=>JSON.stringify(state)),before);
  });
  await test('mobile menu keyboard escape and route actions work',async p=>{
   await p.setViewportSize({width:390,height:844});
@@ -116,7 +150,9 @@ const fs=require('node:fs'),http=require('node:http'),path=require('node:path');
   }
   await p.evaluate(()=>navigateTo('today'));
   assert.equal(await p.locator('.will-reveal').count(),0);
+  await p.setViewportSize({width:1536,height:1024});await p.locator('[data-lang=th]').click();
   await p.screenshot({path:path.join(__dirname,'../test-results/storefront-products.png'),fullPage:true});
+  await p.screenshot({path:path.join(__dirname,'../test-results/soft-glass-reference-viewport.png'),fullPage:false});
  });
  await browser.close();await new Promise(r=>server.close(r));console.log(passed+' passed, '+failed+' failed');process.exitCode=failed?1:0;
 })().catch(e=>{console.error(e);process.exit(1)});

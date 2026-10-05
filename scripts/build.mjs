@@ -1,7 +1,7 @@
 import {build} from 'esbuild';
 import {readFile, writeFile} from 'node:fs/promises';
-const files=['cloud-config','translations','core','dashboard','products','stories','planner','results','lab','settings','transfer','demo','workspace','product-workflow','studio-tools','cloud','integrations','storefront','controller'];
-const css=(await Promise.all(['styles','premium'].map(n=>readFile(new URL('../src/'+n+'.css',import.meta.url),'utf8')))).join('\n');
+const files=['cloud-config','translations','icons','core','dashboard','products','stories','planner','results','lab','settings','transfer','demo','workspace','product-workflow','studio-tools','cloud','integrations','storefront','controller'];
+const css=(await Promise.all(['styles','premium','ambient','commerce'].map(n=>readFile(new URL('../src/'+n+'.css',import.meta.url),'utf8')))).join('\n');
 const sdk=await build({entryPoints:[new URL('../src/auth-sdk.js',import.meta.url).pathname],bundle:true,write:false,minify:true,format:'iife',platform:'browser',target:['es2020'],legalComments:'inline'});
 const js=sdk.outputFiles[0].text+'\n'+(await Promise.all(files.map(n=>readFile(new URL('../src/'+n+'.js',import.meta.url),'utf8')))).join('\n');
 const shell=await readFile(new URL('../src/shell.html',import.meta.url),'utf8');
