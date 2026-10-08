@@ -1,43 +1,41 @@
-# Soft Glass Commerce — design QA
+# Premium Emerald — design QA
 
 final result: passed
 
-## Visual target and evidence
+## Target and comparison
 
-- Source: `/workspace/scratch/fd62f9c600ee/upload/image(4).png`, 1536 × 1024, with the accompanying `Pasted text(1).txt` brief.
-- Matched desktop capture: `test-results/soft-glass-reference-viewport.png`, 1536 × 1024 CSS pixels, device scale factor 1. Source and implementation were opened together in the same comparison input at native dimensions.
-- Additional captures: `test-results/storefront-desktop.png` (empty workspace), `test-results/storefront-products.png` (populated legacy workspace), `test-results/storefront-mobile.png` (390px empty workspace).
-- Cloud-browser inspection: local preview `http://terminal.local:4173/#today`, browser tab 2, viewport 1363 × 936; screenshots, navigation, search for USB, and ascending-price selection inspected directly. Browser screenshot transfer did not materialize in the shared directory; the reproducible repository test captures above provide the saved visual evidence.
-- Content state differs intentionally: the source contains five invented marketplace products, discounts, revenue, and a PRO plan. The implementation uses the existing three legacy demonstration records or an empty real workspace. Data was not rewritten to match the mock.
+- Target: supplied `upload/image(5).png` (1672 × 941) and `Pasted text(2).txt`.
+- Reference-size capture: `test-results/emerald-reference-viewport.png` (1672 × 941 CSS pixels, empty real workspace).
+- Source and implementation images were opened together and compared at the same desktop viewport. Final adjustments were then recaptured and inspected.
+- Other captures: `test-results/storefront-mobile.png`, `storefront-products.png` and `storefront-desktop.png`.
+- Live local preview inspected through the cloud browser. Verified demo mode, product search, combined content filters, clear filters, TH/EN and post-age metric selection. Browser extension metadata errors were unrelated to the application; automated pageerror checks passed.
 
-## Findings and resolved iterations
+## Fidelity and resolved findings
 
-1. P2 — Sparse catalogue left narrow cards in an otherwise empty five-column row. Changed desktop grid to auto-fit available products, with a 165px minimum. Latest capture shows three balanced cards; larger catalogues fit up to five at the reference width.
-2. P2 — Hero was unnecessarily tall and workflow labels wrapped awkwardly. Reduced desktop hero padding, heading size, journey icon dimensions and spacing. Post-fix capture preserves a clear primary URL action and readable three-step workflow.
-3. P2 — Product category badges inherited the dark application badge palette. Scoped ivory-card badges to sage backgrounds and dark text. Verified in the post-fix capture.
-4. P1 — Add-product action was absent on the populated home view when tasks were due. Restored a visible, labelled add-product action alongside the collection heading. Regression tests now cover the existing new-draft workflow again.
-5. P2 — Global search could leave old filters/error text active. Search now resets library filters, and editing the global input clears its accessible error. Verified by UI and regression tests.
+- 246px sidebar, 72px header, 20px dashboard gutter and roughly 394px productivity column align with the supplied desktop composition. The right column starts alongside the hero.
+- Shared charcoal/emerald tokens, mint active states, gold accents, Thai/English navigation sublabels, restrained card highlights and embedded Thai typography applied across all eight routes, forms and dialogs.
+- Global photograph and its CSS payload removed. No decorative body pseudo-elements, global graphics or continuous background animation. The appearance preference now switches to flat surfaces.
+- Generated commerce illustration refined to the target's tilted product/browser card, headphones, orange bag and mint chart. Separate compact empty-library illustration. Both optimized WebP assets embedded in standalone output (35,362 bytes before base64).
+- P2 fixed: oversized hero and detached right column. Matched desktop positioning and shortened the paste-link field to the target proportion.
+- P2 fixed: empty-state buttons inherited a vertical desktop layout. Restored centered inline actions.
+- P1 fixed: native sort select overflowed at 320px in English. Removed its intrinsic minimum width; all tested routes/languages now fit.
+- P2 fixed: homepage filter state could diverge from recovered input fields. Optional presentation state is saved with the existing editing session and reset between workspaces. Existing version-1 sessions and schema-v2 business data remain compatible.
+- P2 fixed: layout/status redraws now return keyboard focus to the selected control.
 
-No actionable P0/P1/P2 findings remain for the agreed production adaptation.
+No actionable P0/P1/P2 findings remain for this production adaptation.
 
-## Required fidelity surfaces
+## Intentional production differences
 
-- Typography: existing embedded Noto Sans Thai retained; large 44px desktop headline, readable Thai/English labels, consistent hierarchy. Mobile headline wraps deliberately, inputs remain readable and touch controls remain usable.
-- Layout rhythm: 224px desktop sidebar, prominent pill-shaped paste field, glass category rail, ivory product/results panels, narrow productivity column, and quick tools. Tablet uses a menu; mobile uses bottom navigation and puts content tools before analytics.
-- Colors: graphite/charcoal, ivory, sage and champagne replace dominant cyan/violet neon. Glass is more opaque than the source to meet the accompanying readability requirement. Text is protected from detailed background imagery.
-- Imagery: one generated warm daylight workspace photograph is embedded as a compressed 36.8KB WebP. Existing product images are preserved. Records without images explicitly say so; fabricated product photos are not attached to user records. Outline icons are vendored Tabler 3.31.0 with MIT license embedded in standalone output. Existing SP identity retained.
-- Copy/content: the main Thai paste-link headline follows the reference. Automatic fetch, multi-marketplace support, PRO subscriptions, bestseller/trending claims and invented discounts are omitted because they are not real capabilities. Commission remains THB/order, not an invented percentage. Results retain the existing 72-hour attribution basis.
+This is not a pixel-identical static mock. The reference contains a fictional profile, notifications, PRO subscription, unsupported marketplaces, AI claims, 3/5 task progress and invented revenue. These are not presented as real features or data.
 
-The hero controls, product card labels and sidebar were also examined as focused regions at native image resolution; additional crops were unnecessary because their typography and spacing were legible in the paired 1536px captures.
+- Real empty workspace: 0/0 planned tasks and missing metrics shown as dashes with clear empty states.
+- Populated workspace: today's actual plan tasks, latest observations at the selected post age, confirmed post-attributed commission, and clicks grouped by Bangkok publication date. No interpolation of absent observations or invented zeroes.
+- Content filters derive from saved stories and registered posts; product evidence status remains separate.
+- Demo data remains explicitly labeled and isolated. Freeform categories, authored Thai/English text and missing-photo states are preserved.
+- Existing SP brand and Tabler library icons retained; generated assets and font rendering can differ from source pixels. Small spacing differences accommodate real labels and accessible controls.
 
-## Interaction and accessibility checks
+## Verification scope
 
-- Direct cloud-browser checks: demo isolation, global search, filtered result, home navigation, and price sorting.
-- Regression: old schema-v2 data, drafts/refresh, TH/EN, import/merge/recovery, Story Studio scenes, Undo/Redo/revisions, teleprompter, keyboard navigation, and reduced motion.
-- Responsive checks: all eight routes in both languages at 320, 390, 768, 1024 and 1440px; matched reference capture at 1536px. No horizontal page overflow.
-- Browser console: no application errors observed. Cloud browser logged extension metadata errors from `chrome-extension://`, unrelated to the application. Automated pageerror assertions passed.
-- Limitation: physical iOS/Safari was not exercised in this environment.
+53 regression checks: upgrade 15, storefront 14, cloud 7, server/database 11, catalogue 6. Responsive route matrix covers 320, 390, 768, 1024, 1440, 1680 and 1920px in TH and EN. Legacy data, reload, wizard drafts, backup/import, offline HTML, scene cards, Undo/Redo and revision restoration included.
 
-## Follow-up polish
-
-The source's brighter glass, profile portrait, notifications, PRO card, marketplace chips and revenue chart require actual product capabilities or source data before they should appear. This implementation intentionally preserves the existing app rather than presenting them as live features.
+Physical iPhone/Safari and real external provider credentials were not exercised. Existing Vercel/Cloudflare configuration, environment variables and CI workflows are unchanged.

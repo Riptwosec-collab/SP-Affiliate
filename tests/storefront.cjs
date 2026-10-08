@@ -12,6 +12,7 @@ const fs=require('node:fs'),http=require('node:http'),path=require('node:path');
   assert.equal(await p.locator('#nav [data-page]').count(),8);
   await p.locator('#brand-home').click();assert.equal(await p.evaluate(()=>page),'today');
   await p.screenshot({path:path.join(__dirname,'../test-results/storefront-desktop.png'),fullPage:true});
+  await p.setViewportSize({width:1672,height:941});await p.screenshot({path:path.join(__dirname,'../test-results/emerald-reference-viewport.png'),fullPage:false});
  });
  await test('real saved products filter without changing records or inventing prices',async p=>{
   const before=await p.evaluate(async()=>{state=demoData();state.products[0].title='Home creator test';state.products[0].category='Home';state.products[1].title='Beauty creator test';state.products[1].category='Beauty';state.products[2].title='Pet creator test';state.products[2].category='Pets';state.products.forEach(x=>{x.variant='TEST';x.usecase='User authored content'});state.products[1].price=null;await persist();render();return JSON.stringify(state)});
@@ -114,6 +115,27 @@ const fs=require('node:fs'),http=require('node:http'),path=require('node:path');
   await p.reload();await p.waitForSelector('.store-hero');assert.equal(await p.locator('#appearance-toggle').getAttribute('aria-pressed'),'true');
   assert.equal(await p.evaluate(()=>JSON.stringify(state)),before);
  });
+ await test('home search, content status and layout restore without modifying saved records',async p=>{
+  const before=await p.evaluate(async()=>{state=demoData();state.products.forEach((p,i)=>p.title='Emerald '+i);state.posts=[];state.stories.forEach(s=>s.ready=false);state.stories[0].ready=true;await persist();render();return JSON.stringify(state)});
+  await p.locator('#store-query').fill('Emerald 0');assert.equal(await p.locator('.showcase-card').count(),1);
+  await p.locator('[data-action=store-layout][data-layout=list]').click();await p.locator('[data-action=store-status][data-status=ready]').click();
+  assert.equal(await p.locator('.showcase-card').count(),1);await p.reload();await p.waitForSelector('.store-hero');
+  assert.equal(await p.locator('#store-query').inputValue(),'Emerald 0');assert.equal(await p.locator('.showcase-list .showcase-card').count(),1);
+  assert.equal(await p.locator('[data-status=ready]').getAttribute('aria-pressed'),'true');
+  await p.locator('[data-lang=en]').click();assert.equal(await p.locator('.showcase-card').count(),1);
+  await p.locator('[data-status=published]').click();assert.equal(await p.locator('.showcase-card').count(),0);assert.ok(await p.locator('.filtered-empty').isVisible());
+  await p.locator('[data-action=store-clear]').click();assert.equal(await p.locator('.showcase-card').count(),3);
+  assert.equal(await p.evaluate(()=>JSON.stringify(state)),before);
+ });
+ await test('goals and charts use real scheduled tasks and same-age latest observations',async p=>{
+  await p.evaluate(async()=>{state=demoData();const tasks=state.plans.flatMap(p=>p.tasks);tasks.forEach((t,i)=>{t.date=i<3?today():dayPlus(today(),2);t.status=i===0?'done':'todo'});await persist();render()});
+  assert.equal(await p.locator('[role=meter]').getAttribute('aria-valuetext'),'1/3');
+  assert.equal(await p.locator('.daily-checklist li').count(),3);
+  assert.equal(await p.locator('.commerce-chart').count(),1);
+  await p.locator('#commerce-window').selectOption('7d');assert.equal(await p.locator('.commerce-chart').count(),0);assert.ok(await p.locator('.chart-empty').isVisible());
+  assert.ok((await p.locator('.insight-metrics').innerText()).includes('—'));
+  assert.equal(await p.evaluate(()=>getComputedStyle(document.body,'::before').content),'none');
+ });
  await test('mobile menu keyboard escape and route actions work',async p=>{
   await p.setViewportSize({width:390,height:844});
   await p.locator('#menu-toggle').click();assert.ok(await p.locator('#workspace-drawer').isVisible());
@@ -137,7 +159,7 @@ const fs=require('node:fs'),http=require('node:http'),path=require('node:path');
  });
  await test('responsive layouts and reduced motion remain accessible',async p=>{
   await p.evaluate(async()=>{state=demoData();await persist();render()});
-  for(const width of [320,390,768,1024,1440]){
+  for(const width of [320,390,768,1024,1440,1680,1920]){
    await p.setViewportSize({width,height:900});
    for(const language of ['th','en']){
     await p.locator('[data-lang='+language+']').click();
