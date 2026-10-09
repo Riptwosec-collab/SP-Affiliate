@@ -12,7 +12,7 @@ const fs=require('node:fs'),http=require('node:http'),path=require('node:path');
   assert.equal(await p.locator('#nav [data-page]').count(),8);
   await p.locator('#brand-home').click();assert.equal(await p.evaluate(()=>page),'today');
   await p.screenshot({path:path.join(__dirname,'../test-results/storefront-desktop.png'),fullPage:true});
-  await p.setViewportSize({width:1672,height:941});await p.screenshot({path:path.join(__dirname,'../test-results/emerald-reference-viewport.png'),fullPage:false});
+  await p.setViewportSize({width:1672,height:941});await p.screenshot({path:path.join(__dirname,'../test-results/editorial-desktop-viewport.png'),fullPage:false});
  });
  await test('real saved products filter without changing records or inventing prices',async p=>{
   const before=await p.evaluate(async()=>{state=demoData();state.products[0].title='Home creator test';state.products[0].category='Home';state.products[1].title='Beauty creator test';state.products[1].category='Beauty';state.products[2].title='Pet creator test';state.products[2].category='Pets';state.products.forEach(x=>{x.variant='TEST';x.usecase='User authored content'});state.products[1].price=null;await persist();render();return JSON.stringify(state)});
@@ -73,7 +73,7 @@ const fs=require('node:fs'),http=require('node:http'),path=require('node:path');
   assert.deepEqual(await p.evaluate(()=>Object.keys(TRANSLATIONS.th).sort()),await p.evaluate(()=>Object.keys(TRANSLATIONS.en).sort()));
   await p.locator('[data-lang=en]').click();assert.equal(await p.locator('html').getAttribute('lang'),'en');
   assert.equal(await p.locator('[data-lang=en]').getAttribute('aria-pressed'),'true');
-  assert.ok((await p.locator('h1').innerText()).includes('Paste a product link.'));
+  assert.ok((await p.locator('h1').innerText()).includes('Products you love.'));
   await p.reload();await p.waitForSelector('.store-hero');assert.equal(await p.locator('html').getAttribute('lang'),'en');
   for(const route of ['today','analyze','products','studio','planner','results','lab','settings']){
    await p.evaluate(r=>navigateTo(r),route);
@@ -157,6 +157,20 @@ const fs=require('node:fs'),http=require('node:http'),path=require('node:path');
   assert.equal(await p.evaluate(()=>document.activeElement.id),'main');
   assert.equal(await p.locator('#title').inputValue(),'Keep my current draft');
  });
+ await test('product rail scrolls by keyboard and keeps offscreen actions reachable',async p=>{
+  await p.setViewportSize({width:390,height:844});
+  const before=await p.evaluate(async()=>{state=demoData();await persist();render();return JSON.stringify(state)});
+  const rail=p.locator('#showcase-grid');
+  assert.equal(await rail.getAttribute('tabindex'),'0');
+  await rail.focus();await p.keyboard.press('ArrowRight');
+  await p.waitForFunction(()=>document.querySelector('#showcase-grid').scrollLeft>0);
+  const last=p.locator('.showcase-card').last().locator('.showcase-actions button').first();
+  await last.focus();
+  await p.waitForFunction(()=>{const r=document.activeElement.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth});
+  assert.ok(await rail.evaluate(e=>e.scrollLeft>0));
+  assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+  assert.equal(await p.evaluate(()=>JSON.stringify(state)),before);
+ });
  await test('responsive layouts and reduced motion remain accessible',async p=>{
   await p.evaluate(async()=>{state=demoData();await persist();render()});
   for(const width of [320,390,768,1024,1440,1680,1920]){
@@ -174,7 +188,7 @@ const fs=require('node:fs'),http=require('node:http'),path=require('node:path');
   assert.equal(await p.locator('.will-reveal').count(),0);
   await p.setViewportSize({width:1536,height:1024});await p.locator('[data-lang=th]').click();
   await p.screenshot({path:path.join(__dirname,'../test-results/storefront-products.png'),fullPage:true});
-  await p.screenshot({path:path.join(__dirname,'../test-results/soft-glass-reference-viewport.png'),fullPage:false});
+  await p.screenshot({path:path.join(__dirname,'../test-results/editorial-products-viewport.png'),fullPage:false});
  });
  await browser.close();await new Promise(r=>server.close(r));console.log(passed+' passed, '+failed+' failed');process.exitCode=failed?1:0;
 })().catch(e=>{console.error(e);process.exit(1)});
