@@ -1,0 +1,178 @@
+/* Reference image(6): emerald glass, cyan edge light and deep contact shadows.
+   Presentation only. No state, provider, data or generated artwork changes. */
+:root {
+  --app-bg: #001310;
+  --sidebar-bg: #001510;
+  --header-bg: #001612;
+  --surface-primary: #002019;
+  --surface-secondary: #102827;
+  --surface-tertiary: #124038;
+  --accent-primary: #72fff0;
+  --accent-hover: #a5fff4;
+  --accent-secondary: #00dbc2;
+  --text-primary: #f6faf8;
+  --text-secondary: #d1ded9;
+  --text-muted: #9dbbb0;
+  --border-default: #44736a80;
+  --border-hover: #60ab9899;
+  --shadow-panel: inset 0 1px 0 #abffe908, 0 10px 28px #00000024;
+  --shadow-control: inset 0 1px 0 #e1fff112, inset 0 -2px 5px #00000035, 0 3px 8px #00000030;
+  --shadow-selected: inset 2px 0 5px #97fff2bb, inset -3px -2px 10px #00e2c54d, inset 0 1px 2px #7bfff899, 0 0 10px #00eac92b;
+}
+body { background: linear-gradient(115deg, #001510, #00231c 57%, #001411); }
+.store-header { background: #001612f5; border-bottom-color: #46685d44; }
+.sidebar { background: linear-gradient(110deg, #000f0d, #001d16); border-right-color: #669c7766; }
+.brand-symbol {
+  width: 38px; height: 38px; font-size: 1.12rem; letter-spacing: -.08em;
+  color: #fff; border: 1px solid #e3d699; border-radius: 11px;
+  background: linear-gradient(135deg, #234936, #001b17 62%, #3c4021);
+  box-shadow: inset 1px 1px 3px #eaffb9bb, inset -1px -1px 3px #f4d55a88, 0 0 5px #93ffd899, 0 0 15px #65e9a82b;
+}
+.brand-symbol span { color: #fff; }
+.brand-title { font-size: 1.2rem; letter-spacing: -.015em; }
+.brand-title small { font-size: .59rem; color: #d5e4dc; }
+.global-search, .collection-search {
+  background: linear-gradient(110deg, #152828, #153631);
+  border-color: #b5d3c970;
+  box-shadow: inset 0 1px 3px #0007, inset 0 -1px 0 #c6ffe70b, 0 1px 0 #daf9e60b;
+}
+.global-search input::placeholder, .collection-search input::placeholder { color: #dce5e0; }
+.language-switch { background: #001a15; border-color: #4a9e8366; }
+.language-switch button.active {
+  background: linear-gradient(115deg, #00ab89, #005645 62%, #002920);
+  color: #fff; box-shadow: inset 0 1px 3px #a4ffe9cc, inset -2px -1px 5px #01e8bc66, 0 0 8px #00ba8c26;
+}
+#nav button { color: #f3f6f4; }
+#nav button svg { color: #edf6f1; }
+#nav button.active {
+  border-color: #65fbd2;
+  background: linear-gradient(100deg, #004737, #001e18 36%, #00271b 80%, #237239);
+  box-shadow: inset 3px 0 4px #a5ffff, inset -4px 0 8px #b6ff8780, inset 0 2px 4px #14efc780, inset 0 -2px 4px #3beea040, 0 0 14px #00cfab30;
+}
+#nav button.active svg { color: #fff; filter: drop-shadow(0 0 5px #4bffc5); }
+.nav-copy strong { font-weight: 650; }
+.nav-copy small { color: #d5e6de; }
+.rail-note {
+  background: linear-gradient(130deg, #05291c, #001912 70%);
+  border-color: #cfb66088;
+  box-shadow: inset 0 1px 0 #f7db7a22, 0 10px 24px #0005;
+}
+.store-hero {
+  background: radial-gradient(ellipse at 64% 18%, #00604a77, transparent 66%), linear-gradient(115deg, #001b16, #00392b 62%, #001d17);
+  border-color: #519c8688;
+  box-shadow: var(--shadow-panel), inset 0 0 38px #00000020;
+}
+.hero-copy h1 { font-weight: 750; text-shadow: 0 2px 3px #0008; }
+.hero-copy .eyebrow { color: #eff7f3; }
+/* The opaque hero raster already contains lighting; filtering its bounding
+   rectangle would leave a visible seam against the blended hero surface. */
+.hero-art img {
+  filter: none;
+  mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent), linear-gradient(to bottom, transparent, #000 12%, #000 78%, transparent);
+  mask-composite: intersect;
+}
+.hero-link-entry {
+  background: linear-gradient(105deg, #fff 35%, #effffb 78%, #c7fff0);
+  border-color: #fff; box-shadow: 0 5px 14px #0005, 0 0 12px #3dfcbd14;
+}
+.hero-link-entry input { color: #182c35; }
+.hero-link-entry input::placeholder { color: #31424b; }
+.hero-link-entry button, .hero-link-entry button:hover {
+  background: linear-gradient(110deg, #003c31, #001a14 60%, #056343);
+  color: #fff; border-color: #70ffe4;
+  box-shadow: inset 1px 1px 4px #00ffbfbb, inset -3px -2px 5px #e7fff5, 0 0 0 1px #45ffd2, 0 0 9px #00efb3cc;
+}
+.hero-link-entry button:hover { border-color: #fff; filter: brightness(1.13); }
+.store-section, .insight-card, .recent-stories {
+  background: linear-gradient(130deg, #002019, #001511 72%, #001d18);
+  border-color: #559e898c; box-shadow: var(--shadow-panel);
+}
+.insight-card { border-left-color: #a2a15e88; }
+.insight-title>svg { color: #f1e876; filter: drop-shadow(0 0 5px #d5dc5133); }
+.filter-chips button, .category-example {
+  background: linear-gradient(145deg, #203735, #102727 50%, #081c1d);
+  border-color: #71858055; box-shadow: var(--shadow-control);
+}
+.filter-chips button svg, .category-example svg { filter: drop-shadow(0 2px 2px #000a); }
+.filter-chips [aria-pressed=true] {
+  background: linear-gradient(120deg, #00684f, #004638 65%, #06302b);
+  border-color: #39ffe0; box-shadow: var(--shadow-selected);
+}
+.filter-chips [aria-pressed=true] svg { color: #e7fff8; filter: drop-shadow(0 0 4px #91ffe777); }
+.filter-chips button:hover, .category-example:hover { border-color: #93d3bf99; }
+.content-filters button, .view-switch, .collection-sort select {
+  background: linear-gradient(125deg, #162c2b, #071e1d); box-shadow: inset 0 1px 0 #effff90a, 0 2px 5px #0003;
+}
+.content-filters [aria-pressed=true] {
+  color: #effffb; background: linear-gradient(110deg, #003b31, #003026 62%, #08745c);
+  border-color: #21eac7; box-shadow: inset 0 -2px 5px #00ddb455, inset 0 1px 2px #73ffe933, 0 0 7px #00dfb51a;
+}
+.content-filters button span { padding: 1px 6px; border-radius: 20px; background: #d2fdfb13; color: #e8fff6; }
+.view-switch [aria-pressed=true] { background: #001915; color: #fff; box-shadow: inset 0 0 5px #0005; }
+.empty-actions .primary, button.primary:not(.hero-link-entry button), button.cyan {
+  background: linear-gradient(125deg, #72ffed, #87fff1 60%, #5aebd7);
+  border-color: #93fff1; color: #002922;
+  box-shadow: inset 0 1px 0 #e9fff7aa, 0 4px 10px #0005, 0 0 14px #21ffd12b;
+}
+.empty-actions .primary:hover, button.primary:not(.hero-link-entry button):hover, button.cyan:hover { background: #a2fff1; }
+.empty-actions .ghost { background: linear-gradient(120deg, #001c16, #002d20); border-color: #3f9c7977; box-shadow: inset 0 1px 2px #adffd011, 0 4px 10px #0004; }
+.empty-art { filter: drop-shadow(0 12px 14px #0009) drop-shadow(0 0 14px #51ffd419); }
+.daily-progress { border-color: #466f5d44; }
+.daily-progress .ring { box-shadow: 0 0 12px #22e8aa14, inset 0 0 4px #89ffe944; }
+.daily-progress .ring>div { background: #001c16; box-shadow: inset 0 2px 10px #0008; }
+.daily-checklist .is-done>svg { filter: drop-shadow(0 0 4px #00eac94d); }
+.insight-metrics>div { background: linear-gradient(135deg, #19312f, #0b2322 70%); box-shadow: var(--shadow-control); }
+.insight-metrics strong { text-shadow: 0 2px 3px #0007; }
+.chart-line { stroke: #52ffe0; filter: drop-shadow(0 0 3px #00dfa9bb); }
+.chart-dot { fill: #dcfff0; filter: drop-shadow(0 0 3px #41ffd2); }
+.commerce-tool {
+  background: linear-gradient(120deg, #18252c, #071f20 80%); border-color: #77959b66; box-shadow: var(--shadow-control);
+}
+.commerce-tool:hover { background: linear-gradient(120deg, #24373b, #0b302c); box-shadow: inset 0 1px 0 #b3fff633, 0 5px 12px #0005; }
+.commerce-tool .tool-icon { color: #41ffe2; filter: drop-shadow(0 0 5px currentColor); }
+.commerce-tool:nth-child(1) .tool-icon { color: #e894ff; }
+.commerce-tool:nth-child(2) .tool-icon { color: #f8e959; }
+.commerce-tool:nth-child(3) .tool-icon { color: #ef8bf9; }
+.commerce-tool>svg { display: block; width: 14px; height: 14px; margin-left: auto; color: #e8f5ef; }
+.showcase-card, .card, .card.glow, .card.stat, dialog {
+  background: linear-gradient(145deg, #092c23, #031b16); box-shadow: var(--shadow-panel);
+}
+.showcase-card:hover { box-shadow: 0 8px 20px #0005, inset 0 1px 0 #90ffe41f; }
+.scene-card, .day, .studio-tabs { box-shadow: inset 0 1px 0 #abffdf0d, 0 4px 12px #0003; }
+@media (min-width: 1440px) {
+  .global-search { height: 40px; }
+  .store-hero { padding-bottom: 16px; }
+  .hero-copy h1 { line-height: 1.24; }
+  .hero-copy h1 span { line-height: 1.42; }
+  .hero-copy>p { margin-bottom: 12px; }
+  .hero-art img { width: 170%; left: -35%; height: 320px; top: -60px; }
+  .hero-link-entry button { min-width: 170px; }
+  .category-heading { margin-bottom: 3px; }
+  .filter-chips button, .category-example { height: 96px; min-height: 96px; gap: 5px; padding-block: 8px; }
+  .category-example>span, .category-name { font-size: .72rem; line-height: 1.4; }
+  .category-example .category-sub, .filter-chips .category-sub { font-size: .59rem; margin-top: 0; }
+  .category-rail { margin-bottom: 14px; }
+  .store-empty { max-width: 690px; min-height: 225px; }
+  .empty-copy { padding-top: 22px; }
+  .empty-copy p { max-width: 405px; margin-top: 6px; margin-bottom: 12px; }
+  .empty-art { width: 32%; max-width: 220px; }
+  .empty-actions button { min-width: 132px; }
+  .commerce-tool { min-height: 58px; padding: 10px; }
+  .performance-card { min-height: 284px; }
+}
+@media (max-width: 760px) {
+  .hero-link-entry button { box-shadow: inset 0 1px 3px #57ffd5aa, inset 0 -1px 3px #d6ffeb88, 0 0 5px #00d9aa66; }
+  .commerce-tool>svg { width: 12px; }
+  #mobile-nav { box-shadow: 0 -5px 22px #0005; }
+  #mobile-nav button.active { background: #063e30; box-shadow: inset 0 2px 0 #55ffd4, inset 0 8px 12px #00bc9822; }
+}
+/* The saved appearance preference is an actual low-distraction alternative. */
+body.focus-background { background: var(--app-bg); }
+body.focus-background :is(.sidebar,.store-hero,.store-section,.insight-card,.recent-stories,.card,.showcase-card,.rail-note,dialog) { background: var(--surface-primary); box-shadow: none; }
+body.focus-background :is(button,.brand-symbol,.global-search,.collection-search,.category-example,.insight-metrics>div,.ring,.ring>div,.scene-card,.day,.studio-tabs) { box-shadow: none; }
+body.focus-background :is(.hero-art img,.empty-art,svg,.tool-icon) { filter: none; }
+body.focus-background .hero-copy h1 { text-shadow: none; }
+@media print {
+  .store-hero,.store-section,.card { background: white; box-shadow: none; }
+  .hero-copy h1 { color: black; text-shadow: none; }
+}
