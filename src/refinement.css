@@ -1,0 +1,101 @@
+/* Pearl surfaces, legible type and progressive interaction. */
+:root {
+  --app-bg:#fbfcfe; --text-primary:#182333; --text-secondary:#526174;
+  --text-muted:#607086; --text:#182333; --muted:#526174;
+  --retail-shadow:0 1px 2px #25354d05,0 8px 24px #344b7210,0 24px 50px #344b7205;
+  font-family:'Noto Sans Thai',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+html { scrollbar-color:#bdc9d9 #f7f9fc; scrollbar-width:thin; }
+body { background:linear-gradient(155deg,#fff 0%,#fbfdff 36%,#f4f7fc 72%,#faf9fd 100%); color:#182333; font-size:16px; line-height:1.7; }
+body.focus-background { background:#fff; }
+h1,h2,h3 { color:#182333; font-weight:700; letter-spacing:-.018em; }
+:lang(th) :is(h1,h2,h3) { letter-spacing:-.012em; }
+button { font-weight:600; }
+label { color:#3c4d63; font-weight:600; font-size:14px; }
+input,select,textarea { color:#182333; border-color:#d1dbe7; background:#fff; }
+p,small,.sub,.muted { color:#526174; }
+.store-header { background:#ffffffed; border-bottom:1px solid #e8edf5; transition:box-shadow .25s,background .25s; }
+.store-header.is-scrolled { background:#fffffff5; box-shadow:0 6px 24px #253f6010; }
+.reading-progress { position:absolute; bottom:0; inset-inline:0; height:2px; background:linear-gradient(90deg,#0071e3,#67b8f6,#8a86d4); transform:scaleX(var(--page-progress,0)); transform-origin:left; pointer-events:none; }
+.sidebar { border-bottom-color:#e0e7f0; }
+.nav-copy strong { font-size:14px; font-weight:600; }
+#nav button { color:#526174; }
+#nav button.active { color:#182333; box-shadow:inset 0 -2px #0071e3; }
+.brand-title { color:#182333; font-weight:700; }
+.brand-symbol { background:linear-gradient(145deg,#283f5c,#15243a); box-shadow:inset 0 1px 0 #ffffff38,0 3px 8px #263b5424; }
+.brand-title small { font-size:11px; color:#526174; }
+.global-search,.collection-search,.hero-link-entry { border-color:#e2e9f2; background:linear-gradient(160deg,#fff,#fcfdff); box-shadow:0 2px 4px #29435f03,inset 0 1px 0 #fff; }
+.global-search input,.collection-search input { background:transparent; }
+.hero-copy h1 { color:#172536; font-weight:700; letter-spacing:-.025em; }
+.hero-copy h1 span { color:#4b6382; }
+.hero-copy .eyebrow { color:#486281; font-weight:600; }
+.hero-aside>p { color:#425570; }
+.hero-footnote,.hero-footnote .badge { color:#586b83; font-size:12px; }
+.hero-link-entry button { background:linear-gradient(140deg,#263b53,#172537); box-shadow:inset 0 1px 0 #ffffff25,0 4px 10px #1c35551a; }
+.hero-link-entry button:hover { background:#263f5e; }
+.text-link,.text-link:hover { color:#0061c4; font-weight:600; }
+.category-heading h2 { color:#526174; font-size:15px; }
+.filter-chips button span,.category-example>span { font-size:13px; font-weight:600; color:#34465d; }
+.filter-chips button svg,.category-example svg { color:#526b89; filter:drop-shadow(0 3px 2px #425f7c10); }
+.filter-chips button small { font-size:11px; color:#526174; }
+.filter-chips [aria-pressed=true] { box-shadow:inset 0 -2px #0071e3; }
+.filter-chips [aria-pressed=true] svg { color:#0071e3; }
+.store-section-head p,.pagehead p { color:#526174; }
+.showcase-card,.store-empty,.recent-list,.recent-empty,.insight-card,.card,dialog { border:1px solid #e5ebf3; background:linear-gradient(160deg,#fff 70%,#fcfdff); box-shadow:var(--retail-shadow); }
+.showcase-card { --tilt-x:0deg; --tilt-y:0deg; }
+.showcase-copy h3 { color:#182333; font-weight:700; }
+.showcase-copy p { color:#526174; font-size:14px; }
+.showcase-top .badge,.showcase-top>span:last-child,.product-saved-date { color:#526174; font-size:12px; }
+.showcase-rating { color:#526174; font-size:13px; font-variant-numeric:tabular-nums; }
+.showcase-price strong { color:#182333; font-size:20px; font-weight:600; font-variant-numeric:tabular-nums; }
+.showcase-price small { color:#526174; font-size:12px; }
+.content-status { color:#85510a; font-weight:600; font-size:12px; }
+.no-photo { background:linear-gradient(145deg,#f7faff,#f2f5fa); color:#526174; box-shadow:inset 0 1px 5px #49678b06; }
+.no-photo svg { color:#7186a2; }
+.showcase-actions button,button.primary,button.cyan { background:linear-gradient(140deg,#006ddd,#0058bf); box-shadow:inset 0 1px 0 #ffffff35,0 3px 8px #006bd11a; }
+.showcase-actions button:hover,button.primary:hover,button.cyan:hover { background:linear-gradient(140deg,#0071e3,#0069d5); }
+.showcase-actions button:last-child { background:#f0f4f9; color:#34465d; box-shadow:none; }
+.showcase-featured { background:linear-gradient(145deg,#20364f,#111c2b); border-color:#35465d; }
+.showcase-featured .showcase-copy h3,.showcase-featured .showcase-price strong { color:#fff; }
+.showcase-featured :is(.showcase-copy p,.showcase-top .badge,.showcase-top>span:last-child,.showcase-price small,.product-saved-date,.showcase-rating) { color:#c0cddd; }
+.showcase-featured .no-photo { background:linear-gradient(145deg,#283e55,#192b40); color:#c0cddd; }
+.showcase-featured .showcase-actions button:last-child { background:#31455f; color:#fff; }
+.insight-metrics>div,.step-index,.tasknum { background:linear-gradient(145deg,#f5f8fd,#eef3fa); }
+.insight-metrics span,.metric-basis,.daily-progress p,.daily-checklist li { color:#526174; font-size:12px; }
+.insight-metrics strong,.ring strong,.card .value { font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
+.insight-title h2 { font-weight:700; }
+.studio-tabs,.language-switch,.view-switch { background:#ecf1f7; }
+.scene-card { background:linear-gradient(150deg,#fff,#fbfdff); border-color:#dce5f0; border-left-color:#0071e3; }
+.scene-card textarea { background:#fcfdff; }
+.store-footer { border-color:#dce5f0; }
+#mobile-nav { background:#ffffffed; border-color:#dde6f1; box-shadow:0 -4px 24px #27435e08; }
+#mobile-nav button.active { color:#005dbf; background:#eaf3ff; }
+/* Content never starts hidden: failed or disabled animation cannot hide controls. */
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference) {
+  body:not(.reduce):not(.focus-background) .showcase-card.is-tilting { transform:perspective(1100px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateY(-5px); transition:transform .12s ease-out,box-shadow .3s; box-shadow:0 10px 26px #344b7215,0 26px 46px #344b7210; }
+  body:not(.reduce):not(.focus-background) .showcase-card::after { content:''; position:absolute; inset:0; z-index:1; border-radius:inherit; pointer-events:none; opacity:0; background:radial-gradient(circle at var(--shine-x,50%) var(--shine-y,0%),#bddfff24,transparent 55%); transition:opacity .3s; }
+  body:not(.reduce):not(.focus-background) .showcase-card.is-tilting::after { opacity:1; }
+  .text-link svg,.commerce-tool>svg { transition:transform .24s; }
+  body:not(.reduce):not(.focus-background) .text-link:hover svg,body:not(.reduce):not(.focus-background) .commerce-tool:hover>svg { transform:translateX(3px); }
+}
+@media (hover:none) {
+  button:active { background-color:#eaf3ff; }
+  body:not(.reduce):not(.focus-background) .showcase-actions button:active { transform:scale(.98); }
+  .showcase-card:hover { transform:none; }
+}
+@media (max-width:760px) {
+  .hero-footnote,.hero-footnote .badge { font-size:11px; }
+  .category-heading h2 { font-size:14px; }
+  .filter-chips button span,.category-example>span { font-size:12px; }
+  .showcase-top { padding-inline:22px; }
+  .showcase-copy,.showcase-bottom { padding-inline:22px; }
+  .showcase-list .showcase-top>span:last-child { font-size:11px; }
+}
+body.focus-background :is(.showcase-card,.store-empty,.recent-list,.recent-empty,.insight-card,.card,dialog,.scene-card,.no-photo) { background:#fff; box-shadow:none; }
+body.focus-background .showcase-featured { background:#172537; }
+body.focus-background .showcase-featured .no-photo { background:#25394f; }
+body.focus-background .hero-copy,body.focus-background .hero-aside { animation:none; }
+body.focus-background .filter-chips button:hover { transform:none; }
+body.focus-background .showcase-card:hover,body.reduce .showcase-card:hover { transform:none; }
+@media (prefers-reduced-motion:reduce) { .showcase-card.is-tilting { transform:none!important; } }
+@media print { body,.showcase-card,.showcase-featured,.card,.scene-card { background:#fff!important; box-shadow:none!important; } .reading-progress { display:none; } }

@@ -1,3 +1,21 @@
+# Pearl typography and motion — design QA, v2.7.1
+
+Validation date: 2026-10-10.
+
+## Current refinement
+
+- Consistent embedded Noto Sans Thai, heavier headings, clearer secondary text and tabular numeric figures.
+- White pearl canvas with a restrained blue/lavender gradient, white cards, fine borders and layered shadows.
+- Fine-pointer 3D tilt, non-blocking highlight, touch press response, one-shot section translations and page-scroll indicator.
+- System/app reduced motion and flat-surface controls disable enhanced motion. No content is initially hidden. Keyboard focus and native scroll remain available.
+- Observer responds only to motion-preference changes, not ordinary scrolling classes. No continuous animation loop or external dependencies.
+
+31 regression checks passed for this refinement: storefront 16 and upgrade 15. These cover all eight routes in both languages at seven widths, pointer effects, preference changes, keyboard rail access, unchanged records, legacy data, refresh recovery, Undo/Redo, revision restore and standalone offline use.
+
+Browser visual inspection covered the header, Thai type, recovered-draft surface and populated product cards. Mobile and desktop test captures are retained in test-results. Physical iPhone/Safari was not tested; no live provider connection was made.
+
+---
+
 # Premium Editorial Commerce — design QA, v2.7
 
 Result: passed in the tested Chromium environment on 2026-10-09.

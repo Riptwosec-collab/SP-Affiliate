@@ -6,7 +6,7 @@ const fs=require('node:fs'),http=require('node:http'),path=require('node:path');
  await new Promise(r=>server.listen(0,'127.0.0.1',r));
  const browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_EXECUTABLE?{executablePath:process.env.CHROMIUM_EXECUTABLE}:{}),args:['--no-sandbox','--disable-dev-shm-usage']});
  let passed=0,failed=0;fs.mkdirSync(path.join(__dirname,'../test-results'),{recursive:true});
- async function test(name,fn){const context=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:'reduce'});const p=await context.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));p.setDefaultTimeout(5000);try{await p.goto('http://127.0.0.1:'+server.address().port);await p.waitForFunction(()=>typeof state!=='undefined'&&!!state&&document.querySelector('.store-hero'));await fn(p);assert.deepEqual(errors,[]);passed++;console.log('PASS',name)}catch(e){failed++;console.error('FAIL',name,e.message);await p.screenshot({path:path.join(__dirname,'../test-results/storefront-failure-'+failed+'.png'),fullPage:true})}finally{await context.close()}}
+ async function test(name,fn){const context=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:'reduce'});const p=await context.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));p.setDefaultTimeout(5000);try{await p.goto('http://127.0.0.1:'+server.address().port);await p.waitForFunction(()=>typeof state!=='undefined'&&!!state&&document.querySelector('.store-hero'));await fn(p);assert.deepEqual(errors,[]);passed++;console.log('PASS',name)}catch(e){failed++;console.error('FAIL',name,e.stack||e.message);await p.screenshot({path:path.join(__dirname,'../test-results/storefront-failure-'+failed+'.png'),fullPage:true})}finally{await context.close()}}
  await test('empty storefront is honest and preserves all workspace routes',async p=>{
   assert.equal(await p.locator('.showcase-card').count(),0);assert.ok(await p.locator('.store-empty').isVisible());
   assert.equal(await p.locator('#nav [data-page]').count(),8);
@@ -169,6 +169,27 @@ const fs=require('node:fs'),http=require('node:http'),path=require('node:path');
   await p.waitForFunction(()=>{const r=document.activeElement.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth});
   assert.ok(await rail.evaluate(e=>e.scrollLeft>0));
   assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+  assert.equal(await p.evaluate(()=>JSON.stringify(state)),before);
+ });
+ await test('pearl interactions respect motion preferences and never change workspace data',async p=>{
+  await p.emulateMedia({reducedMotion:'no-preference'});
+  const before=await p.evaluate(async()=>{state=demoData();await persist();render();return JSON.stringify(state)});
+  const card=p.locator('.showcase-card').first();await card.scrollIntoViewIfNeeded();
+  const rect=await card.boundingBox();await card.hover({position:{x:rect.width*.75,y:rect.height*.35}});
+  const next=await card.boundingBox();await p.mouse.move(next.x+next.width*.65,next.y+next.height*.4,{steps:4});
+  await p.waitForFunction(()=>!!document.querySelector('.showcase-card.is-tilting'));
+  assert.notEqual(await card.evaluate(e=>getComputedStyle(e).transform),'none');
+  await p.emulateMedia({reducedMotion:'reduce'});
+  await p.waitForFunction(()=>!document.querySelector('.is-tilting'));
+  assert.equal(await card.evaluate(e=>getComputedStyle(e).transform),'none');
+  await p.emulateMedia({reducedMotion:'no-preference'});
+  await p.locator('#appearance-toggle').click();
+  await card.scrollIntoViewIfNeeded();const flat=await card.boundingBox();await p.mouse.move(flat.x+flat.width*.75,flat.y+flat.height*.35);
+  assert.equal(await p.locator('.is-tilting').count(),0);
+  await p.waitForFunction(()=>getComputedStyle(document.querySelector('.showcase-card')).boxShadow==='none');
+  await p.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
+  await p.waitForFunction(()=>Number(document.querySelector('.reading-progress').style.getPropertyValue('--page-progress'))>.9);
+  assert.equal(await p.locator('.reading-progress').getAttribute('aria-hidden'),'true');
   assert.equal(await p.evaluate(()=>JSON.stringify(state)),before);
  });
  await test('responsive layouts and reduced motion remain accessible',async p=>{
