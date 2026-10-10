@@ -1684,3 +1684,6 @@ const TRANSLATIONS = {
     "category_short_auto": "Automotive"
   }
 };
+
+Object.assign(TRANSLATIONS.th,{theme_title:'รูปแบบและธีม',theme_description:'เลือกโทนที่สบายตา จำค่าบนอุปกรณ์นี้โดยไม่เปลี่ยนข้อมูลของคุณ',theme_light:'สว่าง',theme_dark:'มืด',theme_system:'ตามระบบ',theme_switch_dark:'เปลี่ยนเป็นธีมมืด',theme_switch_light:'เปลี่ยนเป็นธีมสว่าง',theme_storage_error:'เปลี่ยนธีมแล้ว แต่เบราว์เซอร์ไม่อนุญาตให้จำค่า',experiment_needs_posts:'บันทึกโพสต์อย่างน้อย 2 โพสต์ก่อนเริ่มเปรียบเทียบ A/B'});
+Object.assign(TRANSLATIONS.en,{theme_title:'Appearance & theme',theme_description:'Choose a comfortable palette. Saved on this device without changing your records.',theme_light:'Light',theme_dark:'Dark',theme_system:'System',theme_switch_dark:'Switch to dark theme',theme_switch_light:'Switch to light theme',theme_storage_error:'Theme changed, but this browser cannot save the preference.',experiment_needs_posts:'Register at least 2 published posts before starting an A/B comparison.'});

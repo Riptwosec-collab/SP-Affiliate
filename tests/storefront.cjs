@@ -6,7 +6,7 @@ const fs=require('node:fs'),http=require('node:http'),path=require('node:path');
  await new Promise(r=>server.listen(0,'127.0.0.1',r));
  const browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_EXECUTABLE?{executablePath:process.env.CHROMIUM_EXECUTABLE}:{}),args:['--no-sandbox','--disable-dev-shm-usage']});
  let passed=0,failed=0;fs.mkdirSync(path.join(__dirname,'../test-results'),{recursive:true});
- async function test(name,fn){const context=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:'reduce'});const p=await context.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));p.setDefaultTimeout(5000);try{await p.goto('http://127.0.0.1:'+server.address().port);await p.waitForFunction(()=>typeof state!=='undefined'&&!!state&&document.querySelector('.store-hero'));await fn(p);assert.deepEqual(errors,[]);passed++;console.log('PASS',name)}catch(e){failed++;console.error('FAIL',name,e.stack||e.message);await p.screenshot({path:path.join(__dirname,'../test-results/storefront-failure-'+failed+'.png'),fullPage:true})}finally{await context.close()}}
+ async function test(name,fn){if(process.env.TEST_FILTER&&!name.includes(process.env.TEST_FILTER))return;const context=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:'reduce'});const p=await context.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));p.setDefaultTimeout(5000);try{await p.goto('http://127.0.0.1:'+server.address().port);await p.waitForFunction(()=>typeof state!=='undefined'&&!!state&&document.querySelector('.store-hero'));await fn(p);assert.deepEqual(errors,[]);passed++;console.log('PASS',name)}catch(e){failed++;console.error('FAIL',name,e.stack||e.message);await p.screenshot({path:path.join(__dirname,'../test-results/storefront-failure-'+failed+'.png'),fullPage:true})}finally{await context.close()}}
  await test('empty storefront is honest and preserves all workspace routes',async p=>{
   assert.equal(await p.locator('.showcase-card').count(),0);assert.ok(await p.locator('.store-empty').isVisible());
   assert.equal(await p.locator('#nav [data-page]').count(),8);
@@ -210,6 +210,108 @@ const fs=require('node:fs'),http=require('node:http'),path=require('node:path');
   await p.setViewportSize({width:1536,height:1024});await p.locator('[data-lang=th]').click();
   await p.screenshot({path:path.join(__dirname,'../test-results/storefront-products.png'),fullPage:true});
   await p.screenshot({path:path.join(__dirname,'../test-results/editorial-products-viewport.png'),fullPage:false});
+ });
+
+ await test('category starters open the wizard and never replace an unfinished draft',async p=>{
+  assert.equal(await p.locator('.category-example[data-action=start-category]').count(),11);
+  await p.locator('[data-action=start-category][data-category=fashion]').click();
+  assert.equal(await p.locator('#category').inputValue(),await p.evaluate(()=>uiText('category_fashion')));
+  await p.locator('#title').fill('My original product');
+  await p.locator('#brand-home').click();await p.locator('[data-action=start-category][data-category=beauty]').click();
+  assert.equal(await p.locator('#title').inputValue(),'My original product');
+  assert.equal(await p.locator('#category').inputValue(),await p.evaluate(()=>uiText('category_fashion')));
+  await p.waitForFunction(()=>document.querySelector('#save-status').dataset.state==='saved');
+  await p.reload();await p.waitForSelector('#category');assert.equal(await p.locator('#title').inputValue(),'My original product');
+ });
+ await test('empty dependent menus provide an actionable next step',async p=>{
+  for(const route of ['planner','results']){
+   await p.locator('#nav [data-page='+route+']').click();
+   await p.locator('#main [data-action=nav][data-page=studio]').click();
+   assert.equal(await p.evaluate(()=>page),'studio');
+  }
+  await p.locator('#nav [data-page=lab]').click();
+  assert.ok((await p.locator('#main .notice').first().innerText()).includes('2'));
+  await p.locator('#main [data-page=results]').click();assert.equal(await p.evaluate(()=>page),'results');
+ });
+ await test('theme toggles preserve active drafts and records across refresh and language',async p=>{
+  const before=await p.evaluate(async()=>{state=demoData();await persist();render();return JSON.stringify(state)});
+  await p.locator('#nav [data-page=analyze]').click();await p.locator('#title').fill('Theme must keep this draft');
+  await p.locator('#theme-toggle').click();assert.equal(await p.locator('html').getAttribute('data-theme'),'dark');
+  assert.equal(await p.locator('#title').inputValue(),'Theme must keep this draft');
+  assert.equal(await p.evaluate(()=>JSON.stringify(state)),before);
+  await p.locator('[data-lang=en]').click();assert.equal(await p.locator('#title').inputValue(),'Theme must keep this draft');
+  assert.equal(await p.locator('#theme-toggle').getAttribute('aria-label'),'Switch to light theme');
+  assert.equal(await p.locator('#product-submit').evaluate(e=>getComputedStyle(e).color),'rgb(9, 38, 48)');
+  await p.waitForFunction(()=>document.querySelector('#save-status').dataset.state==='saved');
+  await p.reload();await p.waitForSelector('#title');assert.equal(await p.locator('html').getAttribute('data-theme'),'dark');
+  assert.equal(await p.locator('#title').inputValue(),'Theme must keep this draft');
+  await p.locator('#nav [data-page=settings]').click();await p.locator('#staleHours').fill('123');
+  await p.locator('#main [data-action=theme-select][data-theme=light]').click();
+  assert.equal(await p.locator('#staleHours').inputValue(),'123');assert.equal(await p.evaluate(()=>JSON.stringify(state)),before);
+ });
+ await test('system theme responds to OS changes and mobile drawer controls work',async p=>{
+  await p.setViewportSize({width:320,height:800});await p.emulateMedia({colorScheme:'dark'});
+  await p.locator('#menu-toggle').click();await p.locator('#workspace-drawer [data-theme=system]').click();
+  assert.equal(await p.locator('html').getAttribute('data-theme'),'dark');
+  await p.emulateMedia({colorScheme:'light'});await p.waitForFunction(()=>document.documentElement.dataset.theme==='light');
+  await p.locator('#workspace-drawer [data-theme=dark]').click();
+  await p.emulateMedia({colorScheme:'dark'});await p.emulateMedia({colorScheme:'light'});
+  assert.equal(await p.locator('html').getAttribute('data-theme'),'dark');
+  await p.locator('#workspace-drawer [data-action=appearance]').click();assert.equal(await p.locator('#workspace-drawer [data-action=appearance]').getAttribute('aria-pressed'),'true');
+  await p.keyboard.press('Escape');await p.reload();await p.waitForSelector('.store-hero');
+  assert.equal(await p.locator('html').getAttribute('data-theme'),'dark');
+  assert.ok(await p.evaluate(()=>document.body.classList.contains('focus-background')));
+ });
+ await test('dark palette covers eight routes, both languages and seven screen sizes',async p=>{
+  await p.evaluate(async()=>{state=demoData();await persist();render()});await p.locator('#theme-toggle').click();
+  for(const width of [320,390,768,1024,1440,1680,1920]){
+   await p.setViewportSize({width,height:900});
+   for(const language of ['th','en']){
+    await p.locator('[data-lang='+language+']').click();
+    for(const route of ['today','analyze','products','studio','planner','results','lab','settings']){
+     await p.evaluate(r=>navigateTo(r),route);
+     assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),route+' '+language+' @ '+width);
+     assert.equal(await p.evaluate(()=>getComputedStyle(document.documentElement).colorScheme),'dark');
+     const bad=await p.locator('#main input:not([type=checkbox]):not([type=radio]),#main textarea,#main select').evaluateAll(es=>es.filter(e=>e.getBoundingClientRect().height).filter(e=>{const c=getComputedStyle(e);return c.color==='rgb(29, 29, 31)'||c.backgroundColor==='rgb(255, 255, 255)'}).map(e=>e.id));assert.deepEqual(bad,[]);
+    }
+   }
+  }
+  await p.evaluate(()=>navigateTo('today'));await p.locator('[data-lang=th]').click();
+  await p.setViewportSize({width:1440,height:1000});await p.screenshot({path:path.join(__dirname,'../test-results/dark-desktop.png')});
+  await p.setViewportSize({width:390,height:844});await p.screenshot({path:path.join(__dirname,'../test-results/dark-mobile.png')});
+  await p.locator('#menu-toggle').click();await p.screenshot({path:path.join(__dirname,'../test-results/dark-menu.png')});
+ });
+
+ await test('planner, published results, snapshots and A/B save through their forms',async p=>{
+  await p.evaluate(async()=>{state=demoData();state.plans=[];state.posts=[];state.experiments=[];await persist();render()});
+  await p.locator('#theme-toggle').click();await p.locator('#nav [data-page=planner]').click();
+  await p.locator('.plan-story').first().check();await p.locator('#plan-form button[type=submit]').click();await p.waitForFunction(()=>state.plans.length===1);
+  await p.locator('[data-action=complete-task]').first().click();await p.waitForFunction(()=>state.plans[0].tasks[0].status==='done');
+  await p.locator('#nav [data-page=results]').click();
+  for(const name of ['A','B']){
+   await p.locator('#postName').fill('Workflow post '+name);await p.locator('#postUrl').fill('https://www.tiktok.com/@creator/video/workflow'+name);
+   await p.locator('#publishedAt').fill('2026-01-01T12:00');await p.locator('#post-form button[type=submit]').click();await p.waitForFunction(n=>state.posts.length===n&&document.querySelector('#postName').value==='',name==='A'?1:2);
+  }
+  await p.locator('#metricWindow').selectOption('24h');await p.locator('#metricDate').fill('2026-01-02T12:00');await p.locator('#metricSource').fill('Manual test report');
+  await p.locator('#m-views').fill('1000');await p.locator('#m-clicks').fill('100');await p.locator('#metric-form button[type=submit]').click();await p.waitForFunction(()=>state.posts[0].metrics.length===1);
+  await p.locator('#nav [data-page=lab]').click();await p.locator('#expName').fill('Compare CTA');
+  await p.locator('#expB').selectOption({index:1});await p.locator('#experiment-form button').click();await p.waitForFunction(()=>state.experiments.length===1&&document.querySelector('#expName').value==='');
+  await p.reload();await p.waitForSelector('#experiment-form');assert.equal(await p.evaluate(()=>state.experiments[0].name),'Compare CTA');
+  await p.locator('#nav [data-page=settings]').click();
+  const download=p.waitForEvent('download');await p.locator('#main [data-action=export]').click();const file=await download;
+  assert.ok(file.suggestedFilename().endsWith('.json'));
+  const backup=JSON.parse(fs.readFileSync(await file.path(),'utf8'));assert.equal(backup.data.experiments[0].name,'Compare CTA');
+ });
+ await test('working menu actions compare products, switch plan views and calculate a forecast',async p=>{
+  await p.evaluate(async()=>{state=demoData();await persist();render()});await p.locator('#theme-toggle').click();
+  await p.locator('#nav [data-page=products]').click();
+  await p.locator('.compare-check').nth(0).check();await p.locator('.compare-check').nth(1).check();await p.locator('[data-action=compare]').click();assert.ok(await p.locator('#comparison table').isVisible());
+  await p.locator('#nav [data-page=planner]').click();
+  for(const view of ['calendar','board','list']){await p.locator('[data-action=plan-view][data-view='+view+']').click();assert.equal(await p.evaluate(()=>planView),view);assert.ok(await p.locator(view==='list'?'.task':'.'+view).first().isVisible());}
+  await p.locator('#nav [data-page=lab]').click();
+  for(const [id,value] of Object.entries({fViews:'1000',fClick:'10',fOrder:'5',fValue:'200',fRate:'10',fApproval:'80',fSource:'Creator supplied assumptions'}))await p.locator('#'+id).fill(value);
+  await p.locator('#forecast-form button[type=submit]').click();assert.ok((await p.locator('#forecast-result').innerText()).length>30);
+  await p.locator('#nav [data-page=settings]').click();await p.locator('#staleHours').fill('80');await p.locator('#settings-form button[type=submit]').click();await p.waitForFunction(()=>state.settings.staleHours===80);
  });
  await browser.close();await new Promise(r=>server.close(r));console.log(passed+' passed, '+failed+' failed');process.exitCode=failed?1:0;
 })().catch(e=>{console.error(e);process.exit(1)});

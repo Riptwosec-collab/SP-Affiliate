@@ -1,0 +1,69 @@
+/* Explicit theme surfaces; appearance never modifies workspace data. */
+.theme-options { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
+.theme-options [aria-pressed=true] { color:#005dbf; background:#eaf3ff; border-color:#84b7ee; }
+.theme-flat { margin-top:4px; }
+.drawer-appearance { padding:20px 0; border-top:1px solid var(--line); margin-top:16px; }
+.drawer-appearance h2 { font-size:15px; }
+html[data-theme=dark] {
+ color-scheme:dark; --app-bg:#10151e; --bg:#10151e; --sidebar-bg:#10151e; --header-bg:#151c27;
+ --surface-primary:#1a2330; --surface-secondary:#202c3c; --surface-tertiary:#29374a;
+ --panel:#1a2330; --panel2:#202c3c; --line:#35445a; --border-default:#35445a; --border-hover:#61748f;
+ --text-primary:#edf3fc; --text-secondary:#b4c2d6; --text-muted:#a0b2cb;
+ --text:#edf3fc; --muted:#b4c2d6; --cyan:#73dcea; --blue:#84baff; --violet:#b9abff;
+ --green:#80deaf; --orange:#efbc7c; --red:#ffa7ae; --accent-primary:#73dcea;
+ --retail-shadow:0 1px 0 #ffffff06 inset,0 8px 24px #00000020,0 24px 50px #00000018;
+ scrollbar-color:#53657e #10151e;
+}
+html[data-theme=dark] body { background:radial-gradient(ellipse at 12% 0,#1b2a3c60,transparent 48%),radial-gradient(ellipse at 100% 70%,#31284735,transparent 50%),#10151e; color:var(--text); }
+html[data-theme=dark] :is(h1,h2,h3,.hero-copy h1,.store-empty h3,.empty-copy h3,.product-title,.brand-title,.brand-dot,.footer-brand,.showcase-price strong,.insight-metrics strong,.ring strong,.card .value,td,.workspace-details>summary) { color:var(--text); }
+html[data-theme=dark] :is(p,small,.sub,.muted,label,.soft,summary,.eyebrow,.brand-title small,.hero-copy .eyebrow,.hero-aside>p,.hero-footnote,.hero-footnote .badge,.category-heading h2,.filter-chips button span,.filter-chips button small,.store-section-head p,.pagehead p,.showcase-copy p,.showcase-top .badge,.showcase-top>span:last-child,.showcase-rating,.showcase-price small,.product-saved-date,.recent-copy small,.recent-index,.recent-arrow,.metric-basis,.insight-metrics span,.daily-progress p,.daily-checklist li,.insight-title time,.commerce-chart figcaption,.footer-meta,.store-footer p) { color:var(--muted); }
+html[data-theme=dark] .hero-copy h1 span { color:#9cb3d2; }
+html[data-theme=dark] :is(button,button.ghost,.stepper button) { background:var(--panel); color:var(--text); border-color:var(--line); }
+html[data-theme=dark] button:hover { background:#29384c; border-color:#61748f; }
+html[data-theme=dark] :is(input,select,textarea,.scene-card textarea,.collection-sort select,.hero-link-entry input,.collection-search input) { color:var(--text); background:#141d29; border-color:#455871; }
+html[data-theme=dark] :is(input,textarea)::placeholder { color:#a0b2cb; }
+html[data-theme=dark] :is(.global-search,.collection-search,.hero-link-entry) { background:#141d29; border-color:var(--line); box-shadow:inset 0 1px 0 #ffffff05; }
+html[data-theme=dark] :is(.global-search input,.collection-search input,.hero-link-entry input) { background:transparent; }
+html[data-theme=dark] :is(.store-header,#mobile-nav,.editor-toolbar,.workflow-actions) { background:#151c27f2; border-color:var(--line); box-shadow:0 4px 24px #0002; }
+html[data-theme=dark] :is(.sidebar,.store-footer,.daily-progress,.task,td,.drawer-footer,.commerce-tool,.workspace-details) { border-color:var(--line); }
+html[data-theme=dark] :is(.card,.card.glow,.card.stat,.showcase-card,.store-empty,.recent-list,.recent-empty,.insight-card,dialog,.scene-card,.empty,.day,.prompt-scroll) { color:var(--text); background:linear-gradient(155deg,#1c2736,#19222f); border-color:var(--line); box-shadow:var(--retail-shadow); }
+html[data-theme=dark] :is(.no-photo,.product-img,.product-blank,.insight-metrics>div,.step-index,.tasknum,.empty-icon,.empty-emblem,.flowstrip span,.studio-tabs,.language-switch,.view-switch,th,.bar) { background:#243145; color:var(--muted); border-color:var(--line); }
+html[data-theme=dark] :is(.ring>div,.daily-progress .ring>div) { background:var(--panel); color:var(--text); }
+html[data-theme=dark] .daily-progress .ring { background:conic-gradient(#73dcea calc(var(--v)*1%),#35445a 0); }
+html[data-theme=dark] :is(.header-tools .icon-button,#account-top,#nav button,.workspace-utilities button,.recent-story,.commerce-tool,.collection-head-actions .icon-button,#mobile-nav button) { color:var(--muted); background:transparent; }
+html[data-theme=dark] :is(#nav button.active,#nav button:hover) { color:var(--text); box-shadow:inset 0 -2px var(--cyan); }
+html[data-theme=dark] :is(.filter-chips button,button.text-link,.showcase-image,button.store-brand) { background:transparent; }
+html[data-theme=dark] .filter-chips [aria-pressed=true] { box-shadow:inset 0 -2px var(--cyan); }
+html[data-theme=dark] :is(.filter-chips button svg,.no-photo svg,.recent-empty>svg,.insight-title>svg,.commerce-tool .tool-icon,.commerce-tool>svg) { color:#9cb3d2; }
+html[data-theme=dark] :is(a,.text-link,.text-link:hover,.scene-number,.cyantext,.violettext) { color:#8fdcf0; }
+html[data-theme=dark] :is(.theme-options [aria-pressed=true],.view-switch [aria-pressed=true],.language-switch button.active,.studio-tabs [aria-selected=true],.stepper [aria-current=step],.angle.selected,#workspace-drawer nav button.active,#mobile-nav button.active,.content-filters [aria-pressed=true]) { background:#233e53; color:#a1edf5; border-color:#4a9aac; }
+html[data-theme=dark] :is(button.primary,button.cyan,.showcase-actions button,.hero-link-entry button) { color:#092630; background:linear-gradient(140deg,#82e4ee,#63cbdc); border-color:#82e4ee; box-shadow:inset 0 1px 0 #ffffff50,0 4px 12px #0002; }
+html[data-theme=dark] :is(button.primary:hover,button.cyan:hover,.showcase-actions button:hover,.hero-link-entry button:hover) { background:#a1edf5; }
+html[data-theme=dark] .showcase-actions button:last-child { background:#29394e; color:var(--text); border-color:var(--line); }
+html[data-theme=dark] .showcase-featured { background:linear-gradient(145deg,#243447,#282239); border-color:#645783; }
+html[data-theme=dark] .content-status { color:#efbc7c; }
+html[data-theme=dark] :is(.badge,.badge:not(.blue):not(.cyan):not(.violet):not(.green):not(.orange):not(.red)) { background:#2b394c; color:#c2cfe1; border-color:#455871; }
+html[data-theme=dark] :is(.badge.blue,.badge.cyan) { background:#203c53; color:#99daff; border-color:#3d6382; }
+html[data-theme=dark] .badge.violet { background:#39314e; color:#d3c4ff; border-color:#675987; }
+html[data-theme=dark] .badge.green { background:#1c3b32; color:#97e6bc; border-color:#416954; }
+html[data-theme=dark] .badge.orange { background:#493922; color:#f8ce93; border-color:#756044; }
+html[data-theme=dark] .badge.red { background:#492c36; color:#ffb7be; border-color:#84505c; }
+html[data-theme=dark] :is(.notice.info,.data-note,.recovery-card,.day .job,.banner) { color:#badcf6; background:#21364c; border-color:#48698c; }
+html[data-theme=dark] .notice:not(.info) { color:#f0ce9c; background:#3b3225; border-color:#6c593b; }
+html[data-theme=dark] :is(.notice p,.data-note p,.recovery-card p) { color:inherit; }
+html[data-theme=dark] :is(.field-error,button.danger) { color:#ffacb5; }
+html[data-theme=dark] .hero-entry .field-error { background:#492c36; }
+html[data-theme=dark] :is(pre,code) { color:#d3c4ff; }
+html[data-theme=dark] :is(.toast,.skip-link) { background:#dbe9f9; color:#182333; border-color:#dbe9f9; }
+html[data-theme=dark] dialog::backdrop { background:#03070dba; }
+html[data-theme=dark] :is(button,a,input,select,textarea,summary,[tabindex="0"]):focus-visible { outline-color:#8ae4ef; }
+html[data-theme=dark] body.focus-background { background:#10151e; }
+html[data-theme=dark] body.focus-background :is(.card,.showcase-card,.store-empty,.recent-list,.recent-empty,.insight-card,dialog,.scene-card,.no-photo) { background:#1a2330; box-shadow:none; }
+@media(max-width:760px) { #appearance-toggle { display:none; } .header-tools { gap:3px; } }
+@media print { html[data-theme=dark] body,html[data-theme=dark] :is(.card,.scene-card,.showcase-card) { color:#182333!important; background:#fff!important; } }
+
+html[data-theme=dark] #workspace-drawer nav button { background:var(--panel); color:var(--text); border-color:var(--line); }
+html[data-theme=dark] #workspace-drawer nav button.active { background:#233e53; color:#a1edf5; border-color:#4a9aac; }
+html[data-theme=dark] #nav .navcount { background:#29374a; color:var(--text); }
+
+html[data-theme=dark] a.skip-link { color:#182333; }
